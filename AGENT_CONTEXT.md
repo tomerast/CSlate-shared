@@ -531,7 +531,7 @@ export * from './types'
   "name": "@cslate/shared",
   "version": "0.1.0",
   "description": "Shared Zod schemas and TypeScript types for CSlate client and server",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
