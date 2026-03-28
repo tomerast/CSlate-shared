@@ -116,6 +116,10 @@ describe('ComponentManifestSchema', () => {
       expect(ComponentManifestSchema.safeParse({ ...minimalManifest, name: '' }).success).toBe(false)
     })
 
+    it('rejects empty description', () => {
+      expect(ComponentManifestSchema.safeParse({ ...minimalManifest, description: '' }).success).toBe(false)
+    })
+
     it('rejects name over 100 characters', () => {
       expect(ComponentManifestSchema.safeParse({ ...minimalManifest, name: 'a'.repeat(101) }).success).toBe(false)
     })

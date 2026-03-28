@@ -64,6 +64,8 @@ export const DataSourceSchema = z.object({
 })
 
 export const UserConfigFieldSchema = z.object({
+  // Distinct from FieldTypeSchema: 'string[]' replaces 'array', 'any' is excluded
+  // because user-facing config fields are concrete, not polymorphic
   type: z.enum(['string', 'number', 'boolean', 'string[]', 'object']),
   description: z.string(),
   required: z.boolean(),
@@ -110,8 +112,8 @@ export const ComponentManifestSchema = z.object({
   }).optional(),
 
   // External data sources — max 5, server rejects more with TOO_MANY_DATA_SOURCES
-  dataSources: z.record(DataSourceSchema).optional().superRefine((val, ctx) => {
-    if (val && Object.keys(val).length > 5) {
+  dataSources: z.record(DataSourceSchema).superRefine((val, ctx) => {
+    if (Object.keys(val).length > 5) {
       ctx.addIssue({
         code: z.ZodIssueCode.too_big,
         maximum: 5,
@@ -120,7 +122,7 @@ export const ComponentManifestSchema = z.object({
         message: 'TOO_MANY_DATA_SOURCES: maximum 5 dataSources per manifest',
       })
     }
-  }),
+  }).optional(),
 
   // User-configurable parameters (API keys, settings)
   // sensitive: true fields are stripped by client before community upload
