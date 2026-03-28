@@ -14,6 +14,30 @@ import {
   ErrorCodeSchema,
 } from './api'
 
+const minimalItem = {
+  id: '550e8400-e29b-41d4-a716-446655440000',
+  name: 'Todo List',
+  summary: 'A simple todo list',
+  description: 'A simple todo list component',
+  tags: [],
+  category: 'productivity',
+  complexity: 'simple',
+  rating: 4.5,
+  downloadCount: 100,
+  relevanceScore: 0.9,
+  manifest: {
+    name: 'Todo List',
+    description: 'A simple todo list component',
+    tags: [],
+    inputs: {},
+    outputs: {},
+    events: {},
+    actions: {},
+    files: [{ path: 'ui.tsx', type: 'ui', role: 'Main visual component' }],
+    defaultSize: { width: 3, height: 4 },
+  },
+}
+
 const minimalManifest = {
   name: 'Todo List',
   description: 'A simple todo list component',
@@ -76,6 +100,27 @@ describe('SearchRequestSchema', () => {
   })
 })
 
+describe('SearchResponseSchema', () => {
+  it('accepts valid search response', () => {
+    const response = { results: [minimalItem], total: 1, offset: 0, limit: 10 }
+    expect(SearchResponseSchema.safeParse(response).success).toBe(true)
+  })
+
+  it('accepts empty results', () => {
+    expect(SearchResponseSchema.safeParse({ results: [], total: 0, offset: 0, limit: 10 }).success).toBe(true)
+  })
+
+  it('rejects missing total', () => {
+    const { total: _, ...rest } = { results: [], total: 0, offset: 0, limit: 10 }
+    expect(SearchResponseSchema.safeParse(rest).success).toBe(false)
+  })
+
+  it('rejects result item with invalid manifest', () => {
+    const badItem = { ...minimalItem, manifest: { name: '' } }
+    expect(SearchResponseSchema.safeParse({ results: [badItem], total: 1, offset: 0, limit: 10 }).success).toBe(false)
+  })
+})
+
 describe('UploadResponseSchema', () => {
   it('accepts valid upload response', () => {
     const response = { uploadId: '550e8400-e29b-41d4-a716-446655440000', status: 'pending_review' }
@@ -133,6 +178,21 @@ describe('ReviewEventSchema', () => {
   it('rejects progress outside 0-1', () => {
     const event = { stage: 'security_scan', status: 'in_progress', progress: 1.5 }
     expect(ReviewEventSchema.safeParse(event).success).toBe(false)
+  })
+})
+
+describe('CheckUpdatesRequestSchema', () => {
+  it('accepts valid request with UUIDs', () => {
+    const req = { componentIds: ['550e8400-e29b-41d4-a716-446655440000'] }
+    expect(CheckUpdatesRequestSchema.safeParse(req).success).toBe(true)
+  })
+
+  it('accepts empty componentIds array', () => {
+    expect(CheckUpdatesRequestSchema.safeParse({ componentIds: [] }).success).toBe(true)
+  })
+
+  it('rejects non-UUID component ID', () => {
+    expect(CheckUpdatesRequestSchema.safeParse({ componentIds: ['not-a-uuid'] }).success).toBe(false)
   })
 })
 

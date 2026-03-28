@@ -8,13 +8,13 @@ import type {
   FieldTypeSchema,
   InputFieldSchema,
   OutputFieldSchema,
-  EventSchema,
-  ActionSchema,
+  ComponentEventSchema,
+  ComponentActionSchema,
   FileEntrySchema,
   DataSourceSchema,
-  EndpointSchema,
+  ComponentEndpointSchema,
   UserConfigFieldSchema,
-  SizeSchema,
+  ComponentSizeSchema,
 } from '../schemas/manifest'
 
 import type {
@@ -46,13 +46,13 @@ export type ComponentPackage = z.infer<typeof ComponentPackageSchema>
 export type FieldType = z.infer<typeof FieldTypeSchema>
 export type InputField = z.infer<typeof InputFieldSchema>
 export type OutputField = z.infer<typeof OutputFieldSchema>
-export type ComponentEvent = z.infer<typeof EventSchema>
-export type ComponentAction = z.infer<typeof ActionSchema>
+export type ComponentEvent = z.infer<typeof ComponentEventSchema>
+export type ComponentAction = z.infer<typeof ComponentActionSchema>
 export type FileEntry = z.infer<typeof FileEntrySchema>
 export type DataSource = z.infer<typeof DataSourceSchema>
-export type Endpoint = z.infer<typeof EndpointSchema>
+export type Endpoint = z.infer<typeof ComponentEndpointSchema>
 export type UserConfigField = z.infer<typeof UserConfigFieldSchema>
-export type ComponentSize = z.infer<typeof SizeSchema>
+export type ComponentSize = z.infer<typeof ComponentSizeSchema>
 
 // Checkpoint types
 export type CheckpointUpload = z.infer<typeof CheckpointUploadSchema>

@@ -62,6 +62,10 @@ describe('CheckpointUploadSchema', () => {
   it('accepts empty files record', () => {
     expect(CheckpointUploadSchema.safeParse({ ...validUpload, files: {} }).success).toBe(true)
   })
+
+  it('rejects empty componentName', () => {
+    expect(CheckpointUploadSchema.safeParse({ ...validUpload, componentName: '' }).success).toBe(false)
+  })
 })
 
 describe('CheckpointMetaSchema', () => {

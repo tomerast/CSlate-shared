@@ -11,7 +11,7 @@ export const CheckpointTriggerSchema = z.enum([
 export const CheckpointUploadSchema = z.object({
   projectId: z.string().uuid(),
   componentLocalId: z.string(),      // Local client identifier (not server UUID)
-  componentName: z.string(),
+  componentName: z.string().min(1),
   version: z.string(),               // Local version string, e.g. "v3"
   files: z.record(z.string()),       // path → file content
   manifest: ComponentManifestSchema,

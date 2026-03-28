@@ -17,7 +17,7 @@ export const OutputFieldSchema = z.object({
   stateKey: z.string().optional(),
 })
 
-export const EventSchema = z.object({
+export const ComponentEventSchema = z.object({
   description: z.string(),
   payload: z.record(z.object({
     type: z.string(),
@@ -25,7 +25,7 @@ export const EventSchema = z.object({
   })),
 })
 
-export const ActionSchema = z.object({
+export const ComponentActionSchema = z.object({
   description: z.string(),
   params: z.record(z.object({
     type: z.string(),
@@ -39,7 +39,7 @@ export const FileEntrySchema = z.object({
   role: z.string(),
 })
 
-export const EndpointSchema = z.object({
+export const ComponentEndpointSchema = z.object({
   path: z.string(),
   method: z.enum(['GET', 'POST']),
   description: z.string(),
@@ -56,7 +56,7 @@ export const DataSourceSchema = z.object({
   description: z.string(),
   type: z.enum(['rest-api', 'websocket', 'graphql']),
   baseUrl: z.string().url(),
-  endpoints: z.record(EndpointSchema),
+  endpoints: z.record(ComponentEndpointSchema),
   rateLimit: z.object({
     maxRequests: z.number(),
     perSeconds: z.number(),
@@ -74,7 +74,7 @@ export const UserConfigFieldSchema = z.object({
   example: z.unknown().optional(),
 })
 
-export const SizeSchema = z.object({
+export const ComponentSizeSchema = z.object({
   width: z.number().int().positive(),
   height: z.number().int().positive(),
 })
@@ -90,8 +90,8 @@ export const ComponentManifestSchema = z.object({
   // Data interface
   inputs: z.record(InputFieldSchema),
   outputs: z.record(OutputFieldSchema),
-  events: z.record(EventSchema),
-  actions: z.record(ActionSchema),
+  events: z.record(ComponentEventSchema),
+  actions: z.record(ComponentActionSchema),
 
   // Package structure
   files: z.array(FileEntrySchema),
@@ -136,8 +136,8 @@ export const ComponentManifestSchema = z.object({
   }).optional(),
 
   // Layout
-  defaultSize: SizeSchema,
-  minSize: SizeSchema.optional(),
+  defaultSize: ComponentSizeSchema,
+  minSize: ComponentSizeSchema.optional(),
 })
 
 export const ComponentPackageSchema = z.object({
