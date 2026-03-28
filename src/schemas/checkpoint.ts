@@ -21,7 +21,7 @@ export const CheckpointUploadSchema = z.object({
 
 export const CheckpointMetaSchema = z.object({
   version: z.string(),
-  componentName: z.string(),
+  componentName: z.string().min(1),
   description: z.string(),
   trigger: CheckpointTriggerSchema,
   createdAt: z.string().datetime(),
