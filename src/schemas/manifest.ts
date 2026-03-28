@@ -112,8 +112,8 @@ export const ComponentManifestSchema = z.object({
   }).optional(),
 
   // External data sources — max 5, server rejects more with TOO_MANY_DATA_SOURCES
-  dataSources: z.record(DataSourceSchema).superRefine((val, ctx) => {
-    if (Object.keys(val).length > 5) {
+  dataSources: z.record(DataSourceSchema).optional().superRefine((val, ctx) => {
+    if (val && Object.keys(val).length > 5) {
       ctx.addIssue({
         code: z.ZodIssueCode.too_big,
         maximum: 5,
@@ -122,7 +122,7 @@ export const ComponentManifestSchema = z.object({
         message: 'TOO_MANY_DATA_SOURCES: maximum 5 dataSources per manifest',
       })
     }
-  }).optional(),
+  }),
 
   // User-configurable parameters (API keys, settings)
   // sensitive: true fields are stripped by client before community upload

@@ -184,6 +184,26 @@ describe('ComponentManifestSchema', () => {
       }
       expect(ComponentManifestSchema.safeParse(withBadUrl).success).toBe(false)
     })
+
+    it('rejects missing inputs', () => {
+      const { inputs: _, ...rest } = minimalManifest
+      expect(ComponentManifestSchema.safeParse(rest).success).toBe(false)
+    })
+
+    it('rejects missing outputs', () => {
+      const { outputs: _, ...rest } = minimalManifest
+      expect(ComponentManifestSchema.safeParse(rest).success).toBe(false)
+    })
+
+    it('rejects missing events', () => {
+      const { events: _, ...rest } = minimalManifest
+      expect(ComponentManifestSchema.safeParse(rest).success).toBe(false)
+    })
+
+    it('rejects missing actions', () => {
+      const { actions: _, ...rest } = minimalManifest
+      expect(ComponentManifestSchema.safeParse(rest).success).toBe(false)
+    })
   })
 })
 
