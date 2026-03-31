@@ -142,5 +142,50 @@ export const ComponentManifestSchema = z.object({
 
 export const ComponentPackageSchema = z.object({
   manifest: ComponentManifestSchema,
-  files: z.record(z.string()),
+  files: z.record(z.string()).superRefine((files, ctx) => {
+    if (!('ui.tsx' in files)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'ui.tsx is required — it is the component entry point',
+        path: ['ui.tsx'],
+      })
+    }
+    for (const filePath of Object.keys(files)) {
+      if (filePath.includes('..')) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Path traversal not allowed: "${filePath}"`,
+          path: [filePath],
+        })
+      }
+      if (filePath.startsWith('/')) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Absolute paths not allowed: "${filePath}"`,
+          path: [filePath],
+        })
+      }
+      if (filePath.includes('\0')) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Null bytes not allowed in path: "${filePath}"`,
+          path: [filePath],
+        })
+      }
+    }
+  }),
 })
+
+export type PackageValidationResult =
+  | { valid: true; pkg: z.infer<typeof ComponentPackageSchema> }
+  | { valid: false; errors: string[] }
+
+export function validateComponentPackage(pkg: unknown): PackageValidationResult {
+  const result = ComponentPackageSchema.safeParse(pkg)
+  if (result.success) return { valid: true, pkg: result.data }
+  const errors = result.error.issues.map(issue => {
+    const path = issue.path.length > 0 ? `${issue.path.join('.')}: ` : ''
+    return `${path}${issue.message}`
+  })
+  return { valid: false, errors }
+}
