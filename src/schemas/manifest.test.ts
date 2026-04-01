@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import type { Optional } from '../types'
 import { ComponentManifestSchema, ComponentPackageSchema } from './manifest'
 
 const minimalManifest = {
@@ -224,5 +225,17 @@ describe('ComponentPackageSchema', () => {
       files: {},
     }
     expect(ComponentPackageSchema.safeParse(pkg).success).toBe(false)
+  })
+})
+
+describe('Optional<T, K> utility type', () => {
+  it('compiles: makes specified keys optional without changing others', () => {
+    type Base = { id: string; name: string; age: number }
+    type WithOptionalName = Optional<Base, 'name'>
+
+    const valid: WithOptionalName = { id: '1', age: 30 }
+    const also: WithOptionalName = { id: '2', name: 'Alice', age: 25 }
+    expect(valid.id).toBe('1')
+    expect(also.name).toBe('Alice')
   })
 })

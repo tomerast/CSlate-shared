@@ -1,3 +1,6 @@
+/** Makes specific keys K of type T optional while keeping all other keys required. */
+export type Optional<T, K extends keyof T> = Omit<T, K> & Pick<Partial<T>, K>
+
 // All types are inferred from Zod schemas — never hand-written
 // This guarantees runtime validation and TypeScript types are always in sync
 import type { z } from 'zod'
