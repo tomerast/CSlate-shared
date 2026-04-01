@@ -124,6 +124,7 @@ const MANIFEST_JSON = JSON.stringify(
       { path: 'ui.tsx', type: 'ui', role: 'main render' },
       { path: 'logic.ts', type: 'logic', role: 'data hooks' },
       { path: 'types.ts', type: 'types', role: 'shared interfaces' },
+      { path: 'context.md', type: 'other', role: 'agent context' },
     ],
     defaultSize: { width: 30, height: 25 },
   },
