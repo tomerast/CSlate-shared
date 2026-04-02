@@ -42,7 +42,7 @@ describe('validateComponentPackage', () => {
       files: { 'logic.ts': 'export const x = 1' },
     })
     expect(result.valid).toBe(false)
-    expect(result.errors).toContainEqual(expect.stringContaining('ui.tsx is required'))
+    if (!result.valid) expect(result.errors).toContainEqual(expect.stringContaining('ui.tsx is required'))
   })
 
   it('rejects path traversal', () => {
@@ -51,7 +51,7 @@ describe('validateComponentPackage', () => {
       files: { 'ui.tsx': 'export default () => null', '../evil.ts': 'bad' },
     })
     expect(result.valid).toBe(false)
-    expect(result.errors).toContainEqual(expect.stringContaining('Path traversal'))
+    if (!result.valid) expect(result.errors).toContainEqual(expect.stringContaining('Path traversal'))
   })
 
   it('rejects absolute paths', () => {
@@ -60,7 +60,7 @@ describe('validateComponentPackage', () => {
       files: { 'ui.tsx': 'export default () => null', '/etc/passwd': 'bad' },
     })
     expect(result.valid).toBe(false)
-    expect(result.errors).toContainEqual(expect.stringContaining('Absolute paths'))
+    if (!result.valid) expect(result.errors).toContainEqual(expect.stringContaining('Absolute paths'))
   })
 
   it('rejects null bytes in path', () => {
@@ -69,7 +69,7 @@ describe('validateComponentPackage', () => {
       files: { 'ui.tsx': 'export default () => null', 'evil\0.ts': 'bad' },
     })
     expect(result.valid).toBe(false)
-    expect(result.errors).toContainEqual(expect.stringContaining('Null bytes'))
+    if (!result.valid) expect(result.errors).toContainEqual(expect.stringContaining('Null bytes'))
   })
 
   it('rejects invalid manifest', () => {
