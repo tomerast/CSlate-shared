@@ -16,10 +16,11 @@ export type {
 } from './tools/types'
 
 // Agent loop engine
-export { runSubAgent, runAgentStream } from './loop'
+export { runSubAgent, runAgentStream, runStructuredAgent } from './loop'
 export type {
   RunSubAgentParams,
   RunAgentStreamParams,
+  RunStructuredAgentParams,
   AgentStreamResult,
   SubAgentResult,
   TokenUsage,

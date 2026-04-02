@@ -1,4 +1,5 @@
-import { generateText, streamText, stepCountIs, type ModelMessage } from 'ai'
+import { generateText, generateObject, streamText, stepCountIs, type ModelMessage } from 'ai'
+import type { z } from 'zod'
 import type { AgentRegistry } from './providers'
 
 /**
@@ -147,4 +148,44 @@ export function runAgentStream(params: RunAgentStreamParams): AgentStreamResult 
         }
       : {}),
   }) as any
+}
+
+/**
+ * Parameters for running a structured output agent (generateObject).
+ */
+export interface RunStructuredAgentParams<T> {
+  modelId: string
+  registry: AgentRegistry
+  system: string
+  prompt: string
+  schema: z.ZodType<T>
+  maxOutputTokens?: number
+  abortSignal?: AbortSignal
+}
+
+/**
+ * Runs a structured output agent using generateObject.
+ * Returns the parsed object matching the provided Zod schema.
+ */
+export async function runStructuredAgent<T>(params: RunStructuredAgentParams<T>): Promise<T> {
+  const {
+    modelId,
+    registry,
+    system,
+    prompt,
+    schema,
+    maxOutputTokens,
+    abortSignal,
+  } = params
+
+  const { object } = await generateObject({
+    model: registry.languageModel(modelId),
+    system,
+    prompt,
+    schema,
+    ...(maxOutputTokens ? { maxOutputTokens } : {}),
+    abortSignal,
+  })
+
+  return object
 }
