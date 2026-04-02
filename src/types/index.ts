@@ -21,6 +21,16 @@ import type {
 } from '../schemas/manifest'
 
 import type {
+  PipelineManifestSchema,
+  PipelinePackageSchema,
+  PipelineOutputSchema,
+  PipelineSecretSchema,
+  PipelineParamSchema,
+  PipelineOutputFieldSchema,
+  PipelineStrategySchema,
+} from '../schemas/pipeline-manifest'
+
+import type {
   CheckpointUploadSchema,
   CheckpointMetaSchema,
   CheckpointListResponseSchema,
@@ -56,6 +66,15 @@ export type DataSource = z.infer<typeof DataSourceSchema>
 export type Endpoint = z.infer<typeof ComponentEndpointSchema>
 export type UserConfigField = z.infer<typeof UserConfigFieldSchema>
 export type ComponentSize = z.infer<typeof ComponentSizeSchema>
+
+// Pipeline types
+export type PipelineManifest = z.infer<typeof PipelineManifestSchema>
+export type PipelinePackage = z.infer<typeof PipelinePackageSchema>
+export type PipelineOutput = z.infer<typeof PipelineOutputSchema>
+export type PipelineSecret = z.infer<typeof PipelineSecretSchema>
+export type PipelineParam = z.infer<typeof PipelineParamSchema>
+export type PipelineOutputField = z.infer<typeof PipelineOutputFieldSchema>
+export type PipelineStrategy = z.infer<typeof PipelineStrategySchema>
 
 // Checkpoint types
 export type CheckpointUpload = z.infer<typeof CheckpointUploadSchema>
