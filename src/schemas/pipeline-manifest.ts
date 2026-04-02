@@ -20,8 +20,8 @@ export const PipelineOutputFieldSchema = z.object({
 
 export const PipelineStrategySchema = z.object({
   type: z.enum(['on-demand', 'polling', 'streaming']),
-  intervalMs: z.number().optional(),
-  cacheTtlMs: z.number().optional(),
+  intervalMs: z.number().int().positive().optional(),
+  cacheTtlMs: z.number().int().positive().optional(),
 })
 
 export const PipelineManifestSchema = z.object({

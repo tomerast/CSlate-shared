@@ -66,6 +66,30 @@ describe('PipelineManifestSchema', () => {
     expect(result.success).toBe(false)
   })
 
+  it('rejects polling strategy with zero intervalMs', () => {
+    const result = PipelineManifestSchema.safeParse({
+      ...minimalManifest,
+      strategy: { type: 'polling', intervalMs: 0 },
+    })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects polling strategy with negative intervalMs', () => {
+    const result = PipelineManifestSchema.safeParse({
+      ...minimalManifest,
+      strategy: { type: 'polling', intervalMs: -1000 },
+    })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects zero cacheTtlMs', () => {
+    const result = PipelineManifestSchema.safeParse({
+      ...minimalManifest,
+      strategy: { type: 'polling', intervalMs: 5000, cacheTtlMs: 0 },
+    })
+    expect(result.success).toBe(false)
+  })
+
   it('rejects invalid param type', () => {
     const result = PipelineManifestSchema.safeParse({
       ...minimalManifest,
