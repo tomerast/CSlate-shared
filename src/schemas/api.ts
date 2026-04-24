@@ -73,24 +73,36 @@ export const PipelineSourceResponseSchema = z.object({
   updatedAt: z.union([z.string(), z.date()]),
 })
 
-// Review pipeline SSE stream
-// Stage names are the authoritative enum — CSlate-Server imports this directly
+// Review pipeline SSE stream.
+// Includes current component stages, current pipeline stages, and legacy stage
+// names retained for clients that may still read older upload records.
 export const ReviewStageSchema = z.enum([
-  'manifest_validation',   // Stage 1: Validate manifest schema + completeness
-  'security_scan',         // Stage 2: Check for malicious patterns (fetch, XHR, WebSocket abuse)
-  'dependency_check',      // Stage 3: Validate dependencies are safe/available
-  'quality_review',        // Stage 4: Code quality + Tailwind token enforcement (STYLING_TOKEN_VIOLATION)
-  'test_render',           // Stage 5: TypeScript compilation + JSX validity
-  'cataloging',            // Stage 6: AI summarization + categorization + AI hint generation
-  'embedding',             // Stage 7: Vector embedding generation
+  // Current component upload stages
+  'manifest_validation',
+  'dependency_check',
+  'agent_review',
+  'cataloging',
+  'embedding',
+  // Current pipeline upload stages
+  'manifest-validation',
+  'dependency-check',
+  'agent-review',
+  'embedding-store',
+  // Legacy component stages
+  'security_scan',
+  'quality_review',
+  'test_render',
 ])
 
 export const ReviewEventSchema = z.object({
-  stage: ReviewStageSchema.or(z.literal('complete')),
-  status: z.enum(['in_progress', 'complete', 'failed']),
+  stage: ReviewStageSchema.or(z.literal('complete')).optional(),
+  status: z.enum(['in_progress', 'complete', 'failed', 'approved', 'rejected']),
   progress: z.number().min(0).max(1).optional(),
-  result: z.enum(['passed', 'failed', 'approved', 'rejected']).optional(),
+  result: z.unknown().optional(),
   componentId: z.string().uuid().optional(),  // Present when stage=complete + status=approved
+  pipelineId: z.string().uuid().optional(),
+  rejectionReasons: z.unknown().optional(),
+  error: z.string().optional(),
   reason: z.string().optional(),              // Present on rejection (e.g. STYLING_TOKEN_VIOLATION)
 })
 

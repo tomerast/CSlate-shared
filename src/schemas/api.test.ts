@@ -177,10 +177,12 @@ describe('PipelineSourceResponseSchema', () => {
 })
 
 describe('ReviewStageSchema', () => {
-  it('accepts all 7 review stages', () => {
+  it('accepts current and legacy review stages', () => {
     const stages = [
-      'manifest_validation', 'security_scan', 'dependency_check',
-      'quality_review', 'test_render', 'cataloging', 'embedding',
+      'manifest_validation', 'dependency_check', 'agent_review',
+      'cataloging', 'embedding', 'manifest-validation',
+      'dependency-check', 'agent-review', 'embedding-store',
+      'security_scan', 'quality_review', 'test_render',
     ]
     stages.forEach(stage => {
       expect(ReviewStageSchema.safeParse(stage).success).toBe(true)
@@ -214,6 +216,14 @@ describe('ReviewEventSchema', () => {
       status: 'failed',
       result: 'rejected',
       reason: 'STYLING_TOKEN_VIOLATION: bg-blue-500 used instead of bg-primary',
+    }
+    expect(ReviewEventSchema.safeParse(event).success).toBe(true)
+  })
+
+  it('accepts terminal server event without stage', () => {
+    const event = {
+      status: 'rejected',
+      rejectionReasons: [{ stage: 'agent_review', issues: [] }],
     }
     expect(ReviewEventSchema.safeParse(event).success).toBe(true)
   })
