@@ -53,13 +53,25 @@ const minimalManifest = {
 }
 
 describe('RegisterResponseSchema', () => {
-  it('accepts valid registration response', () => {
-    const response = { apiKey: 'sk-abc123', userId: '550e8400-e29b-41d4-a716-446655440000' }
+  it('accepts dev/verify API-key response', () => {
+    const response = {
+      apiKey: 'sk-abc123',
+      user: {
+        id: '550e8400-e29b-41d4-a716-446655440000',
+        email: 'dev@example.com',
+        displayName: null,
+      },
+    }
     expect(RegisterResponseSchema.safeParse(response).success).toBe(true)
   })
 
-  it('rejects invalid userId', () => {
-    expect(RegisterResponseSchema.safeParse({ apiKey: 'sk-abc', userId: 'not-uuid' }).success).toBe(false)
+  it('accepts email-verification message response', () => {
+    expect(RegisterResponseSchema.safeParse({ message: 'Verification email sent' }).success).toBe(true)
+  })
+
+  it('rejects invalid user id', () => {
+    const response = { apiKey: 'sk-abc', user: { id: 'not-uuid', email: 'dev@example.com' } }
+    expect(RegisterResponseSchema.safeParse(response).success).toBe(false)
   })
 })
 
@@ -68,9 +80,9 @@ describe('SearchRequestSchema', () => {
     expect(SearchRequestSchema.safeParse({ q: 'stock ticker' }).success).toBe(true)
   })
 
-  it('applies defaults: limit=10, offset=0, sortBy=relevance', () => {
+  it('applies defaults: limit=20, offset=0, sortBy=relevance', () => {
     const result = SearchRequestSchema.parse({ q: 'stock ticker' })
-    expect(result.limit).toBe(10)
+    expect(result.limit).toBe(20)
     expect(result.offset).toBe(0)
     expect(result.sortBy).toBe('relevance')
   })
@@ -79,8 +91,8 @@ describe('SearchRequestSchema', () => {
     expect(SearchRequestSchema.safeParse({ q: '' }).success).toBe(false)
   })
 
-  it('rejects limit over 50', () => {
-    expect(SearchRequestSchema.safeParse({ q: 'test', limit: 51 }).success).toBe(false)
+  it('rejects limit over 100', () => {
+    expect(SearchRequestSchema.safeParse({ q: 'test', limit: 101 }).success).toBe(false)
   })
 
   it('rejects invalid sortBy', () => {
@@ -105,6 +117,25 @@ describe('SearchRequestSchema', () => {
 describe('SearchResponseSchema', () => {
   it('accepts valid search response', () => {
     const response = { results: [minimalItem], total: 1, offset: 0, limit: 10 }
+    expect(SearchResponseSchema.safeParse(response).success).toBe(true)
+  })
+
+  it('accepts raw database search fields returned by API routes', () => {
+    const response = {
+      results: [{
+        ...minimalItem,
+        summary: null,
+        category: null,
+        complexity: null,
+        download_count: 100,
+        rating_sum: 9,
+        rating_count: 2,
+        relevance_score: 0.9,
+      }],
+      total: 1,
+      offset: 0,
+      limit: 10,
+    }
     expect(SearchResponseSchema.safeParse(response).success).toBe(true)
   })
 
@@ -288,11 +319,23 @@ describe('RateComponentRequestSchema', () => {
   })
 })
 
+describe('ReportAbuseRequestSchema', () => {
+  it('accepts server-supported report reasons', () => {
+    const reasons = ['malicious', 'broken', 'inappropriate', 'copyright', 'other']
+    reasons.forEach(reason => {
+      expect(ReportAbuseRequestSchema.safeParse({ reason }).success).toBe(true)
+    })
+  })
+
+  it('rejects retired report reasons', () => {
+    expect(ReportAbuseRequestSchema.safeParse({ reason: 'malicious-code' }).success).toBe(false)
+  })
+})
+
 describe('ApiErrorSchema', () => {
   it('accepts valid error envelope', () => {
     const err = {
       error: { code: 'NOT_FOUND', message: 'Component not found' },
-      statusCode: 404,
     }
     expect(ApiErrorSchema.safeParse(err).success).toBe(true)
   })
@@ -312,6 +355,8 @@ describe('ErrorCodeSchema', () => {
       'AUTH_REQUIRED', 'FORBIDDEN', 'NOT_FOUND', 'VALIDATION_ERROR',
       'MANIFEST_INVALID', 'UPLOAD_TOO_LARGE', 'REVIEW_REJECTED', 'RATE_LIMITED',
       'SERVER_ERROR', 'TOO_MANY_DATA_SOURCES', 'STYLING_TOKEN_VIOLATION',
+      'MISSING_PIPELINE_ENTRY', 'SOURCE_NOT_AVAILABLE',
+      'PIPELINE_RATINGS_NOT_IMPLEMENTED', 'PIPELINE_REPORTS_NOT_IMPLEMENTED',
     ]
     codes.forEach(code => {
       expect(ErrorCodeSchema.safeParse(code).success).toBe(true)

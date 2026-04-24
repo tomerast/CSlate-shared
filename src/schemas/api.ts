@@ -2,10 +2,25 @@ import { z } from 'zod'
 import { ComponentManifestSchema } from './manifest'
 
 // Auth
-export const RegisterResponseSchema = z.object({
-  apiKey: z.string(),
-  userId: z.string().uuid(),
+export const AuthUserSchema = z.object({
+  id: z.string().uuid(),
+  email: z.string().email(),
+  displayName: z.string().nullable().optional(),
 })
+
+export const AuthApiKeyResponseSchema = z.object({
+  apiKey: z.string(),
+  user: AuthUserSchema.optional(),
+})
+
+export const AuthMessageResponseSchema = z.object({
+  message: z.string(),
+})
+
+export const RegisterResponseSchema = z.union([
+  AuthApiKeyResponseSchema,
+  AuthMessageResponseSchema,
+])
 
 // Search
 export const SearchRequestSchema = z.object({
@@ -13,7 +28,7 @@ export const SearchRequestSchema = z.object({
   tags: z.array(z.string()).optional(),
   category: z.string().optional(),
   complexity: z.enum(['simple', 'moderate', 'complex']).optional(),
-  limit: z.number().int().min(1).max(50).default(10),
+  limit: z.number().int().min(1).max(100).default(20),
   offset: z.number().int().min(0).default(0),
   minRating: z.number().min(1).max(5).optional(),
   sortBy: z.enum(['relevance', 'rating', 'downloads', 'recent']).default('relevance'),
@@ -22,16 +37,26 @@ export const SearchRequestSchema = z.object({
 export const SearchResultItemSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
-  summary: z.string(),         // AI-generated 1-2 sentence "why this was built"
+  title: z.string().optional(),
+  summary: z.string().nullable().optional(), // AI-generated 1-2 sentence "why this was built"
   description: z.string(),
   tags: z.array(z.string()),
-  category: z.string(),
-  complexity: z.string(),
-  rating: z.number(),
-  downloadCount: z.number(),
-  relevanceScore: z.number(),
+  category: z.string().nullable().optional(),
+  complexity: z.string().nullable().optional(),
+  rating: z.number().optional(),
+  downloadCount: z.number().optional(),
+  download_count: z.number().optional(),
+  ratingSum: z.number().optional(),
+  rating_sum: z.number().optional(),
+  ratingCount: z.number().optional(),
+  rating_count: z.number().optional(),
+  relevanceScore: z.number().optional(),
+  relevance_score: z.number().optional(),
   manifest: ComponentManifestSchema,
-})
+}).refine(
+  (item) => item.relevanceScore !== undefined || item.relevance_score !== undefined,
+  { message: 'Expected relevanceScore or relevance_score' },
+)
 
 export const SearchResponseSchema = z.object({
   results: z.array(SearchResultItemSchema),
@@ -133,7 +158,7 @@ export const RateComponentRequestSchema = z.object({
 
 // Abuse report
 export const ReportAbuseRequestSchema = z.object({
-  reason: z.enum(['malicious-code', 'spam', 'copyright', 'inappropriate', 'other']),
+  reason: z.enum(['malicious', 'broken', 'inappropriate', 'copyright', 'other']),
   description: z.string().max(1000).optional(),
 })
 
@@ -144,7 +169,7 @@ export const ApiErrorSchema = z.object({
     message: z.string(),
     details: z.unknown().optional(),
   }),
-  statusCode: z.number(),
+  statusCode: z.number().optional(),
 })
 
 // Known error codes — consumers can switch on these
@@ -160,4 +185,8 @@ export const ErrorCodeSchema = z.enum([
   'SERVER_ERROR',
   'TOO_MANY_DATA_SOURCES',
   'STYLING_TOKEN_VIOLATION',  // Raw Tailwind color utility used instead of semantic design token
+  'MISSING_PIPELINE_ENTRY',
+  'SOURCE_NOT_AVAILABLE',
+  'PIPELINE_RATINGS_NOT_IMPLEMENTED',
+  'PIPELINE_REPORTS_NOT_IMPLEMENTED',
 ])
