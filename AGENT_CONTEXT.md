@@ -24,11 +24,11 @@ Both repos import from `@cslate/shared`. Neither repo duplicates these type defi
 
 ## What CSlate Is (Product Context)
 
-CSlate is an AI-powered desktop app builder. Non-technical users describe UI components in natural language, an AI agent generates live React components, renders them on a canvas ("Slate"), and iterates based on feedback. Accepted components can be shared to a community library.
+CSlate is a desktop chat portal for LLMs. Users chat with an assistant, and when an answer is clearer as a visual, the assistant renders a live React card inline in the conversation. Accepted components can be shared to a community library after server review.
 
 The **core loop:**
 ```
-Describe → Search community library → AI generates component → Render on canvas → Iterate → Share
+Chat → Search community library → Render inline card or generate component → Iterate in message context → Share
 ```
 
 **Components** are structured multi-file packages:
@@ -681,7 +681,7 @@ The server also uses `ReviewStageSchema` as the authoritative list of stages —
 These are in scope eventually but not for the initial package:
 
 - `SlateTheme` schema — design token system
-- `GridConfig` / `ComponentPlacement` schemas — canvas layout
+- `InlineCard` schema — richer message-card metadata
 - `LLMConfig` schema — provider configuration
 - `AppManifest` schema — top-level app structure (`cslate.json`)
 - `TabConfig` schema — tab layout + component placement

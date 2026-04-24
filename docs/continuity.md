@@ -259,7 +259,7 @@ Major schema changes require coordinated updates in CSlate client and CSlate ser
 
 ## Known Gaps
 
-- `AGENT_CONTEXT.md` describes an older canvas-first product. Prefer this guide for current chat-portal context.
+- `AGENT_CONTEXT.md` is retained as bootstrap context; prefer this guide for current chat-portal details.
 - `ReviewStageSchema` still describes the older seven-stage component review sequence, while the server runner currently uses `manifest_validation`, `dependency_check`, `agent_review`, `cataloging`, and `embedding`.
 - Shared schemas do not yet include `AgentMessage` and `Session`; the client mirrors them locally in `CSlate/src/shared/agentTypes.ts`.
 - Server upload manifests currently use package-local schemas instead of this package’s component schema.
