@@ -41,9 +41,36 @@ export const SearchResponseSchema = z.object({
 })
 
 // Upload
+// Server returns 202 Accepted with `status: 'pending'` — review happens async
+// on the worker. Clients subscribe to the SSE stream at
+// `/api/v1/components/upload/:id/stream` to receive terminal status.
 export const UploadResponseSchema = z.object({
   uploadId: z.string().uuid(),
-  status: z.literal('pending_review'),
+  status: z.literal('pending'),
+})
+
+// Source fetch — `GET /api/v1/components/:id/source`
+// Files are keyed by path, values are raw text (e.g. `{ 'ui.tsx': '...', 'bundle.js': '...' }`).
+export const ComponentSourceResponseSchema = z.object({
+  id: z.string().uuid(),
+  manifest: ComponentManifestSchema,
+  files: z.record(z.string(), z.string()),
+  summary: z.string().optional(),
+  version: z.string(),
+  updatedAt: z.union([z.string(), z.date()]),
+})
+
+// Source fetch — `GET /api/v1/pipelines/:id/source`
+// Same shape as component source but the manifest is a PipelineManifest.
+// We don't import PipelineManifestSchema here to keep this file dependency-light;
+// consumers that need stricter validation can narrow afterwards.
+export const PipelineSourceResponseSchema = z.object({
+  id: z.string().uuid(),
+  manifest: z.unknown(),
+  files: z.record(z.string(), z.string()),
+  summary: z.string().optional(),
+  version: z.string(),
+  updatedAt: z.union([z.string(), z.date()]),
 })
 
 // Review pipeline SSE stream

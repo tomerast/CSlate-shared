@@ -4,6 +4,8 @@ import {
   SearchRequestSchema,
   SearchResponseSchema,
   UploadResponseSchema,
+  ComponentSourceResponseSchema,
+  PipelineSourceResponseSchema,
   ReviewStageSchema,
   ReviewEventSchema,
   CheckUpdatesRequestSchema,
@@ -123,13 +125,54 @@ describe('SearchResponseSchema', () => {
 
 describe('UploadResponseSchema', () => {
   it('accepts valid upload response', () => {
-    const response = { uploadId: '550e8400-e29b-41d4-a716-446655440000', status: 'pending_review' }
+    const response = { uploadId: '550e8400-e29b-41d4-a716-446655440000', status: 'pending' }
     expect(UploadResponseSchema.safeParse(response).success).toBe(true)
   })
 
-  it('rejects status other than pending_review', () => {
+  it('rejects status other than pending', () => {
     const response = { uploadId: '550e8400-e29b-41d4-a716-446655440000', status: 'approved' }
     expect(UploadResponseSchema.safeParse(response).success).toBe(false)
+  })
+})
+
+describe('ComponentSourceResponseSchema', () => {
+  const base = {
+    id: '550e8400-e29b-41d4-a716-446655440000',
+    manifest: minimalItem.manifest,
+    files: { 'ui.tsx': 'export default () => null', 'bundle.js': 'module.exports = {}' },
+    version: '1.0.0',
+    updatedAt: new Date().toISOString(),
+  }
+
+  it('accepts a valid source response', () => {
+    expect(ComponentSourceResponseSchema.safeParse(base).success).toBe(true)
+  })
+
+  it('accepts a Date for updatedAt', () => {
+    expect(ComponentSourceResponseSchema.safeParse({ ...base, updatedAt: new Date() }).success).toBe(true)
+  })
+
+  it('rejects missing files', () => {
+    const { files: _unused, ...rest } = base
+    expect(ComponentSourceResponseSchema.safeParse(rest).success).toBe(false)
+  })
+
+  it('rejects non-string file contents', () => {
+    const bad = { ...base, files: { 'ui.tsx': 123 } }
+    expect(ComponentSourceResponseSchema.safeParse(bad).success).toBe(false)
+  })
+})
+
+describe('PipelineSourceResponseSchema', () => {
+  it('accepts pipeline source with opaque manifest', () => {
+    const response = {
+      id: '550e8400-e29b-41d4-a716-446655440000',
+      manifest: { name: 'p', strategyType: 'on-demand' },
+      files: { 'pipeline.ts': 'export default {}' },
+      version: '1.0.0',
+      updatedAt: new Date().toISOString(),
+    }
+    expect(PipelineSourceResponseSchema.safeParse(response).success).toBe(true)
   })
 })
 
